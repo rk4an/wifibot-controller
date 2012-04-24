@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WifiBotLab2 Controller</string>
+    <string name="sForward">Forward</string>
+    <string name="sBackward">Backward</string>
+    <string name="sLeft">Left</string>
+    <string name="sRight">Right</string>
+    <string name="sRotate">Rotate</string>
+    <string name="sIP">IP</string>
+    <string name="sSettings">Settings</string>
+    <string name="sAbout">About</string>
+    <string name="sState"></string>
+    <string name="sSpeed"></string>
+</resources>
