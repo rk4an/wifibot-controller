@@ -47,7 +47,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-public class WifiBotLab2Activity extends Activity implements OnClickListener, OnTouchListener, OnSeekBarChangeListener {
+public class WifibotLab2Activity extends Activity implements OnClickListener, OnTouchListener, OnSeekBarChangeListener {
 
 
 	private WifibotCmdSender wcs = null;
@@ -110,7 +110,7 @@ public class WifiBotLab2Activity extends Activity implements OnClickListener, On
 		if(elem.getId() == R.id.btnForward)
 		{
 			if (action == MotionEvent.ACTION_DOWN){
-				wcs.forward(WifiBotLab2Activity.SPEED);
+				wcs.forward(WifibotLab2Activity.SPEED);
 			}
 			else if (action == MotionEvent.ACTION_UP){
 				wcs.nothing();
@@ -120,7 +120,7 @@ public class WifiBotLab2Activity extends Activity implements OnClickListener, On
 		if(elem.getId() == R.id.btnBackward)
 		{
 			if (action == MotionEvent.ACTION_DOWN){
-				wcs.backward(WifiBotLab2Activity.SPEED);
+				wcs.backward(WifibotLab2Activity.SPEED);
 			}
 			else if (action == MotionEvent.ACTION_UP){
 				wcs.nothing();
@@ -130,7 +130,7 @@ public class WifiBotLab2Activity extends Activity implements OnClickListener, On
 		if(elem.getId() == R.id.btnLeft)
 		{
 			if (action == MotionEvent.ACTION_DOWN){
-				wcs.direction(WifiBotLab2Activity.SPEED, true, true);
+				wcs.direction(WifibotLab2Activity.SPEED, true, true);
 			}
 			else if (action == MotionEvent.ACTION_UP){
 				wcs.nothing();
@@ -140,7 +140,7 @@ public class WifiBotLab2Activity extends Activity implements OnClickListener, On
 		if(elem.getId() == R.id.btnRight)
 		{
 			if (action == MotionEvent.ACTION_DOWN){
-				wcs.direction(WifiBotLab2Activity.SPEED, false, true);
+				wcs.direction(WifibotLab2Activity.SPEED, false, true);
 			}
 			else if (action == MotionEvent.ACTION_UP){
 				wcs.nothing();
@@ -150,7 +150,7 @@ public class WifiBotLab2Activity extends Activity implements OnClickListener, On
 		if(elem.getId() == R.id.btnRotate)
 		{
 			if (action == MotionEvent.ACTION_DOWN){
-				wcs.rotate(WifiBotLab2Activity.SPEED, true);
+				wcs.rotate(WifibotLab2Activity.SPEED, true);
 			}
 			else if (action == MotionEvent.ACTION_UP){
 				wcs.nothing();
@@ -180,11 +180,11 @@ public class WifiBotLab2Activity extends Activity implements OnClickListener, On
 			
 				
 				SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-				String ip = pref.getString("ip", WifiBotLab2Activity.IP);
+				String ip = pref.getString("ip", WifibotLab2Activity.IP);
 				
 				try {
 					Socket socket = new Socket();
-					socket.connect(new InetSocketAddress(ip, WifiBotLab2Activity.PORT), 1000);
+					socket.connect(new InetSocketAddress(ip, WifibotLab2Activity.PORT), 1000);
 
 					InputStream is = socket.getInputStream();
 					DataInputStream dis = new DataInputStream(is);
@@ -195,7 +195,7 @@ public class WifiBotLab2Activity extends Activity implements OnClickListener, On
 					timer = new Timer();
 					wcs = new WifibotCmdSender();
 					wcs.configure(dos,dis);
-					timer.scheduleAtFixedRate(wcs, 0, WifiBotLab2Activity.REFRESH_TIME);
+					timer.scheduleAtFixedRate(wcs, 0, WifibotLab2Activity.REFRESH_TIME);
 					
 					btnForward.setEnabled(true);
 					btnBackward.setEnabled(true);
@@ -280,7 +280,7 @@ public class WifiBotLab2Activity extends Activity implements OnClickListener, On
 
 	@Override
 	public void onStopTrackingTouch(SeekBar seekBar) {
-		WifiBotLab2Activity.SPEED = seekBar.getProgress();
+		WifibotLab2Activity.SPEED = seekBar.getProgress();
 		TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
 		tvSpeed.setText("Speed: " + seekBar.getProgress());
 		
