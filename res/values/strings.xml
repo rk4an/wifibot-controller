@@ -11,4 +11,5 @@
     <string name="sAbout">About</string>
     <string name="sState"></string>
     <string name="sSpeed"></string>
+    <string name="sVoltage"></string>
 </resources>

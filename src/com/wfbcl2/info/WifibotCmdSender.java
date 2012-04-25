@@ -24,6 +24,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.TimerTask;
 
+import android.util.Log;
+
+
 public class WifibotCmdSender extends TimerTask {
 
 	private DataOutputStream dos = null;
@@ -31,6 +34,12 @@ public class WifibotCmdSender extends TimerTask {
 	private boolean connected = false;
 	byte[] dataArray = new byte[9];
 	private final int RESPONSE_LENGTH = 21;
+	private WifibotLab2Activity context = null;
+	byte[] rdata = new byte[RESPONSE_LENGTH];
+
+	public WifibotCmdSender(WifibotLab2Activity context){
+		this.context = context;
+	}
 
 	/**
 	 * 
@@ -58,14 +67,27 @@ public class WifibotCmdSender extends TimerTask {
 			dos.write(data);
 			dos.flush();
 
+			String tt = "";
+			for(int i=0;i<9;i++) {
+				tt += String.format("%x", data[i]) + " ";
+			}
+			Log.d("WRITE",tt);
+			
 			//read response
-			byte[] rdata = new byte[RESPONSE_LENGTH];
 			dis.readFully(rdata);
 
-			/*for(int i=0;i<RESPONSE_LENGTH;i++) {
-				System.out.print(String.format("%x", data[i]) + " ");
+			String t = "";
+			for(int i=0;i<RESPONSE_LENGTH;i++) {
+				t += String.format("%x", rdata[i]) + " ";
 			}
-			System.out.println("");*/
+			Log.d("READ",t);
+			
+			context.voltage = (short)(rdata[2] & 0xff);
+			context.fr = (short)(rdata[11] & 0xff);
+			context.fl = (short)(rdata[3] & 0xff);
+			context.br = (short)(rdata[4] & 0xff);
+			context.bl = (short)(rdata[12] & 0xff);
+			context.handler.post(context.updateUI);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -215,7 +237,7 @@ public class WifibotCmdSender extends TimerTask {
 		dataArray[8] = (byte) (crc.getValue()>>8);
 	}
 
-
+	
 	@Override
 	public void run() {
 

@@ -16,17 +16,27 @@ public final class R {
         public static final int settings=0x7f020002;
     }
     public static final class id {
+        public static final int TextView01=0x7f070012;
+        public static final int TextView02=0x7f070011;
         public static final int btnBackward=0x7f070006;
         public static final int btnConnected=0x7f070001;
         public static final int btnForward=0x7f070002;
         public static final int btnLeft=0x7f070003;
         public static final int btnRight=0x7f070005;
         public static final int btnRotate=0x7f070004;
-        public static final int iAbout=0x7f07000a;
-        public static final int iSettings=0x7f070009;
+        public static final int iAbout=0x7f070014;
+        public static final int iSettings=0x7f070013;
+        public static final int pgBL=0x7f07000f;
+        public static final int pgBR=0x7f070010;
+        public static final int pgFL=0x7f07000b;
+        public static final int pgFR=0x7f07000c;
+        public static final int pgVoltage=0x7f070009;
         public static final int sbSpeed=0x7f070007;
+        public static final int textView1=0x7f07000d;
+        public static final int textView2=0x7f07000e;
         public static final int tvSpeed=0x7f070008;
         public static final int tvState=0x7f070000;
+        public static final int tvVoltage=0x7f07000a;
     }
     public static final class layout {
         public static final int main=0x7f030000;
@@ -46,6 +56,7 @@ public final class R {
         public static final int sSettings=0x7f050007;
         public static final int sSpeed=0x7f05000a;
         public static final int sState=0x7f050009;
+        public static final int sVoltage=0x7f05000b;
     }
     public static final class xml {
         public static final int prefs=0x7f040000;
