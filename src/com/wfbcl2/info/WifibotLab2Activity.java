@@ -42,6 +42,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -49,25 +52,29 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-public class WifibotLab2Activity extends Activity implements OnClickListener, OnTouchListener, OnSeekBarChangeListener {
+public class WifibotLab2Activity extends Activity implements OnClickListener, OnTouchListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 
 
 	private WifibotCmdSender wcs = null;
 	private static String IP = "192.168.1.106";
 	private static int PORT = 15020;
 	private static int REFRESH_TIME = 100;
-	private static int SPEED = 10;
 	private static int VOLTAGE_MAX = 18;
+	private static int SPEED_MAX = 510;
+	private static int SPEED = 200;
+	private static int IR_MAX = 255;
 	private Timer timer = null;
-	
+
 	public int voltage = 0;
-	public int fl = 0;
-	public int fr = 0;
-	public int bl = 0;
-	public int br = 0;
-	
+	public int ir_fr_lf = 0;
+	public int ir_fr_rt = 0;
+	public int ir_bk_lf = 0;
+	public int ir_bk_rt = 0;
+
+	public boolean onSecurity = false;
+
 	Handler handler = new Handler();
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -90,34 +97,38 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 
 		ToggleButton btnConnected = (ToggleButton) findViewById(R.id.btnConnected);
 		btnConnected.setOnClickListener(this);
-	
+
 		SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
 		sbSpeed.setOnSeekBarChangeListener(this);
-		sbSpeed.setMax(240);
+		sbSpeed.setMax(SPEED_MAX);
 		sbSpeed.setProgress(SPEED);
-		
+
 		TextView tvState = (TextView) findViewById(R.id.tvState);
 		tvState.setText("State: Disconnected");
-		
+
 		TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
 		tvSpeed.setText("Speed: " + SPEED);
-		
+
 		TextView tvVoltage = (TextView) findViewById(R.id.tvVoltage);
 		tvVoltage.setText("Voltage: 0");
-		
+
 		ProgressBar pgVoltage = (ProgressBar) findViewById(R.id.pgVoltage);
 		pgVoltage.setMax(VOLTAGE_MAX);
-		
+
 		ProgressBar pgFR = (ProgressBar) findViewById(R.id.pgFR);
-		pgFR.setMax(255);
+		pgFR.setMax(IR_MAX);
+		
 		ProgressBar pgFL = (ProgressBar) findViewById(R.id.pgFL);
-		pgFL.setMax(255);
-		
+		pgFL.setMax(IR_MAX);
+
 		ProgressBar pgBR = (ProgressBar) findViewById(R.id.pgBR);
-		pgBR.setMax(255);
+		pgBR.setMax(IR_MAX);
 		ProgressBar pgBL = (ProgressBar) findViewById(R.id.pgBL);
-		pgBL.setMax(255);
-		
+		pgBL.setMax(IR_MAX);
+
+		CheckBox cbSecurity = (CheckBox) findViewById(R.id.cbSecurity);
+		cbSecurity.setOnCheckedChangeListener(this);
+
 		btnConnected.setChecked(false);
 		btnForward.setEnabled(false);
 		btnBackward.setEnabled(false);
@@ -130,10 +141,9 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 		pgFL.setEnabled(false);
 		pgBR.setEnabled(false);
 		pgBL.setEnabled(false);
-		
-		
+		cbSecurity.setEnabled(false);
 	}
-	
+
 
 	@Override
 	public boolean onTouch(View elem, MotionEvent event) {
@@ -189,13 +199,13 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 				wcs.nothing();
 			}
 		}
-		
+
 		return false;
 	}
 
 	@Override
 	public void onClick(View v) {
-		
+
 		Button btnForward = (Button) findViewById(R.id.btnForward);
 		Button btnBackward = (Button) findViewById(R.id.btnBackward);
 		Button btnLeft = (Button) findViewById(R.id.btnLeft);
@@ -210,15 +220,16 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 		ProgressBar pgFL = (ProgressBar) findViewById(R.id.pgFL);
 		ProgressBar pgBR = (ProgressBar) findViewById(R.id.pgBR);
 		ProgressBar pgBL = (ProgressBar) findViewById(R.id.pgBL);
-		
+		CheckBox cbSecurity = (CheckBox) findViewById(R.id.cbSecurity);
+
 		if(v.getId() == R.id.btnConnected){
-			
+
 			if(((ToggleButton) v).isChecked()) {
-			
-				
+
+
 				SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
 				String ip = pref.getString("ip", WifibotLab2Activity.IP);
-				
+
 				try {
 					Socket socket = new Socket();
 					socket.connect(new InetSocketAddress(ip, WifibotLab2Activity.PORT), 1000);
@@ -228,12 +239,12 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 
 					OutputStream out = socket.getOutputStream();
 					DataOutputStream dos = new DataOutputStream(out);
-					
+
 					timer = new Timer();
 					wcs = new WifibotCmdSender(this);
 					wcs.configure(dos,dis);
 					timer.scheduleAtFixedRate(wcs, 0, WifibotLab2Activity.REFRESH_TIME);
-					
+
 					btnForward.setEnabled(true);
 					btnBackward.setEnabled(true);
 					btnLeft.setEnabled(true);
@@ -245,9 +256,10 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 					pgFL.setEnabled(true);
 					pgBR.setEnabled(true);
 					pgBL.setEnabled(true);
-					
+					cbSecurity.setEnabled(true);
+
 					tvState.setText("State: Connected");
-					
+
 				}
 				catch (Exception e) {
 					tvState.setText("State: " + e.getMessage());
@@ -272,14 +284,15 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 				pgBR.setProgress(0);
 				pgBL.setEnabled(false);
 				pgBL.setProgress(0);
+				cbSecurity.setEnabled(false);
 				tvVoltage.setText("Voltage: 0");
 				if(timer != null)
 					timer.cancel();
 			}
 		}
 	}
-	
-	
+
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -309,7 +322,7 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 			return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
 	@Override
 	protected void onStop() {
 		super.onStop();
@@ -321,14 +334,14 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 	@Override
 	public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 
 	@Override
 	public void onStartTrackingTouch(SeekBar seekBar) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 
@@ -337,34 +350,41 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 		WifibotLab2Activity.SPEED = seekBar.getProgress();
 		TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
 		tvSpeed.setText("Speed: " + seekBar.getProgress());
-		
 	}
-	
+
 
 	/**
 	 * 
 	 */
 	public Runnable updateUI = new Runnable() {
-	    public void run() {
+		public void run() {
 			TextView tvVoltage = (TextView) findViewById(R.id.tvVoltage);
 			float voltage_value = (float) (WifibotLab2Activity.this.voltage/10.0);
 			tvVoltage.setText("Voltage: " + voltage_value);
-			
+
 			ProgressBar pgVoltage = (ProgressBar) findViewById(R.id.pgVoltage);
 			pgVoltage.setProgress((int)voltage_value);
-			
+
 			ProgressBar pgFR = (ProgressBar) findViewById(R.id.pgFR);
-			pgFR.setProgress((int)fr);
-			
+			pgFR.setProgress((int)ir_fr_rt);
+
 			ProgressBar pgFL = (ProgressBar) findViewById(R.id.pgFL);
-			pgFL.setProgress((int)fl);
-			
+			pgFL.setProgress((int)ir_fr_lf);
+
 			ProgressBar pgBR = (ProgressBar) findViewById(R.id.pgBR);
-			pgBR.setProgress((int)br);
-			
+			pgBR.setProgress((int)ir_bk_rt);
+
 			ProgressBar pgBL = (ProgressBar) findViewById(R.id.pgBL);
-			pgBL.setProgress((int)bl);
-	    }
+			pgBL.setProgress((int)ir_bk_lf);
+		}
 	};
-	
+
+	@Override
+	public void onCheckedChanged(CompoundButton cb, boolean state) {
+
+		if(cb.getId() == R.id.cbSecurity) {
+			this.onSecurity = state;
+		}
+	}
+
 }

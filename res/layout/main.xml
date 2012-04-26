@@ -27,7 +27,8 @@
             android:id="@+id/btnConnected"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="ToggleButton" />
+            android:textOn="@string/sOn"
+            android:textOff="@string/sOff" />
 
     </LinearLayout>
 
@@ -144,7 +145,8 @@
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:paddingRight="2dip" />
 
                 <ProgressBar
                     android:id="@+id/pgFR"
@@ -160,14 +162,14 @@
                 android:orientation="horizontal" >
 
                 <TextView
-                    android:id="@+id/textView1"
+                    android:id="@+id/tvFL"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="IR FL" />
 
                 <TextView
-                    android:id="@+id/textView2"
+                    android:id="@+id/tvFR"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -184,7 +186,8 @@
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    android:paddingRight="2dip" />
 
                 <ProgressBar
                     android:id="@+id/pgBR"
@@ -201,18 +204,36 @@
                 android:orientation="horizontal" >
 
                 <TextView
-                    android:id="@+id/TextView02"
+                    android:id="@+id/tvBL"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="IR BL" />
 
                 <TextView
-                    android:id="@+id/TextView01"
+                    android:id="@+id/tvBR"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="IR BR" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal" >
+
+                <CheckBox
+                    android:id="@+id/cbSecurity"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/sSecurity" />
+
+
+
             </LinearLayout>
 
         </LinearLayout>
