@@ -24,8 +24,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.TimerTask;
 
-import android.util.Log;
-
 
 public class WifibotCmdSender extends TimerTask {
 
