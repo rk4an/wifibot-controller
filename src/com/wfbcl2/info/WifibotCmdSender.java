@@ -105,7 +105,9 @@ public class WifibotCmdSender extends TimerTask {
 			context.irFl = (short)(rdata[3] & 0xff);
 			context.irBr = (short)(rdata[4] & 0xff);
 			context.irBl = (short)(rdata[12] & 0xff);
+			context.current = (short)(rdata[17] & 0xff);
 			context.handler.post(context.updateUI);
+			
 
 		} catch (IOException e) {
 			e.printStackTrace();

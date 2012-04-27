@@ -15,4 +15,5 @@
     <string name="sOn">Control</string>
     <string name="sOff">Control</string>
     <string name="sSecurity">Security</string>
+    <string name="sCurrent"></string>
 </resources>

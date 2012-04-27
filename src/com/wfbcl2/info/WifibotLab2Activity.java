@@ -71,6 +71,7 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 	
 	private Timer timer = null;
 	public int voltage = 0;
+	public int current = 0;
 	public int speed = SPEED_DEFAULT;
 	public int irFl = 0;
 	public int irFr = 0;
@@ -356,6 +357,8 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 			TextView tvVoltage = (TextView) findViewById(R.id.tvVoltage);
 			float voltage_value = (float) (WifibotLab2Activity.this.voltage/10.0);
 			tvVoltage.setText("Voltage: " + voltage_value);
+			
+			((TextView) findViewById(R.id.tvCurrent)).setText(WifibotLab2Activity.this.current*100 + "mA");
 
 			ProgressBar pgVoltage = (ProgressBar) findViewById(R.id.pgVoltage);
 			pgVoltage.setProgress((int)voltage_value);

@@ -229,6 +229,14 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="@string/sSecurity" />
+
+                <TextView
+                    android:id="@+id/tvCurrent"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/sCurrent" />
+
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
