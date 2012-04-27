@@ -32,7 +32,7 @@ public class WifibotCmdSender extends TimerTask {
 	private boolean connected = false;
 	byte[] dataArray = new byte[9];
 	private final int RESPONSE_LENGTH = 21;
-	private final int IR_LIMIT = 60;
+	
 	private WifibotLab2Activity context = null;
 	byte[] rdata = new byte[RESPONSE_LENGTH];
 
@@ -67,14 +67,14 @@ public class WifibotCmdSender extends TimerTask {
 			//check security
 			if(context.onSecurity) {
 				//block forward
-				if(dataArray[6] == 0x5b && (rdata[11] > IR_LIMIT || rdata[3] > IR_LIMIT)){
+				if(dataArray[6] == 0x5b && (rdata[11] > WifibotLab2Activity.IR_LIMIT || rdata[3] > WifibotLab2Activity.IR_LIMIT)){
 					dataArray[2] = 0;
 					dataArray[3] = 0;
 					dataArray[4] = 0;
 					dataArray[5] = 0;
 				}
 				
-				if(dataArray[6] == 0x0b && (rdata[12] > IR_LIMIT || rdata[4] > IR_LIMIT)){
+				if(dataArray[6] == 0x0b && (rdata[12] > WifibotLab2Activity.IR_LIMIT || rdata[4] > WifibotLab2Activity.IR_LIMIT)){
 					dataArray[2] = 0;
 					dataArray[3] = 0;
 					dataArray[4] = 0;
@@ -101,10 +101,10 @@ public class WifibotCmdSender extends TimerTask {
 			//Log.d("READ",read_cmd);
 			
 			context.voltage = (short)(rdata[2] & 0xff);
-			context.ir_fr_rt = (short)(rdata[11] & 0xff);
-			context.ir_fr_lf = (short)(rdata[3] & 0xff);
-			context.ir_bk_rt = (short)(rdata[4] & 0xff);
-			context.ir_bk_lf = (short)(rdata[12] & 0xff);
+			context.irFr = (short)(rdata[11] & 0xff);
+			context.irFl = (short)(rdata[3] & 0xff);
+			context.irBr = (short)(rdata[4] & 0xff);
+			context.irBl = (short)(rdata[12] & 0xff);
 			context.handler.post(context.updateUI);
 
 		} catch (IOException e) {

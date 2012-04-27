@@ -31,6 +31,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -54,23 +55,27 @@ import android.widget.ToggleButton;
 
 public class WifibotLab2Activity extends Activity implements OnClickListener, OnTouchListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 
-
 	private WifibotCmdSender wcs = null;
 	private static String IP = "192.168.1.106";
 	private static int PORT = 15020;
 	private static int REFRESH_TIME = 100;
+	
 	private static int VOLTAGE_MAX = 18;
+	private static int VOLTAGE_LIMIT = 11;
+	
 	private static int SPEED_MAX = 510;
-	private static int SPEED = 200;
+	private static int SPEED_DEFAULT = 200;
+	
 	private static int IR_MAX = 255;
+	public static int IR_LIMIT = 60;
+	
 	private Timer timer = null;
-
 	public int voltage = 0;
-	public int ir_fr_lf = 0;
-	public int ir_fr_rt = 0;
-	public int ir_bk_lf = 0;
-	public int ir_bk_rt = 0;
-
+	public int speed = SPEED_DEFAULT;
+	public int irFl = 0;
+	public int irFr = 0;
+	public int irBl = 0;
+	public int irBr = 0;
 	public boolean onSecurity = false;
 
 	Handler handler = new Handler();
@@ -101,13 +106,13 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 		SeekBar sbSpeed = (SeekBar) findViewById(R.id.sbSpeed);
 		sbSpeed.setOnSeekBarChangeListener(this);
 		sbSpeed.setMax(SPEED_MAX);
-		sbSpeed.setProgress(SPEED);
+		sbSpeed.setProgress(speed);
 
 		TextView tvState = (TextView) findViewById(R.id.tvState);
 		tvState.setText("State: Disconnected");
 
 		TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
-		tvSpeed.setText("Speed: " + SPEED);
+		tvSpeed.setText("Speed: " + speed);
 
 		TextView tvVoltage = (TextView) findViewById(R.id.tvVoltage);
 		tvVoltage.setText("Voltage: 0");
@@ -150,50 +155,45 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 
 		int action = event.getAction();
 
-		if(elem.getId() == R.id.btnForward)
-		{
+		if(elem.getId() == R.id.btnForward) {
 			if (action == MotionEvent.ACTION_DOWN){
-				wcs.forward(WifibotLab2Activity.SPEED);
+				wcs.forward(speed);
 			}
 			else if (action == MotionEvent.ACTION_UP){
 				wcs.nothing();
 			}
 		}
 
-		if(elem.getId() == R.id.btnBackward)
-		{
+		if(elem.getId() == R.id.btnBackward) {
 			if (action == MotionEvent.ACTION_DOWN){
-				wcs.backward(WifibotLab2Activity.SPEED);
+				wcs.backward(speed);
 			}
 			else if (action == MotionEvent.ACTION_UP){
 				wcs.nothing();
 			}
 		}
 
-		if(elem.getId() == R.id.btnLeft)
-		{
+		if(elem.getId() == R.id.btnLeft) {
 			if (action == MotionEvent.ACTION_DOWN){
-				wcs.direction(WifibotLab2Activity.SPEED, true, true);
+				wcs.direction(speed, true, true);
 			}
 			else if (action == MotionEvent.ACTION_UP){
 				wcs.nothing();
 			}
 		}
 
-		if(elem.getId() == R.id.btnRight)
-		{
+		if(elem.getId() == R.id.btnRight) {
 			if (action == MotionEvent.ACTION_DOWN){
-				wcs.direction(WifibotLab2Activity.SPEED, false, true);
+				wcs.direction(speed, false, true);
 			}
 			else if (action == MotionEvent.ACTION_UP){
 				wcs.nothing();
 			}
 		}
 
-		if(elem.getId() == R.id.btnRotate)
-		{
+		if(elem.getId() == R.id.btnRotate) {
 			if (action == MotionEvent.ACTION_DOWN){
-				wcs.rotate(WifibotLab2Activity.SPEED, true);
+				wcs.rotate(speed, true);
 			}
 			else if (action == MotionEvent.ACTION_UP){
 				wcs.nothing();
@@ -225,7 +225,6 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 		if(v.getId() == R.id.btnConnected){
 
 			if(((ToggleButton) v).isChecked()) {
-
 
 				SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
 				String ip = pref.getString("ip", WifibotLab2Activity.IP);
@@ -333,21 +332,17 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 
 	@Override
 	public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
-		// TODO Auto-generated method stub
-
 	}
 
 
 	@Override
 	public void onStartTrackingTouch(SeekBar seekBar) {
-		// TODO Auto-generated method stub
-
 	}
 
 
 	@Override
 	public void onStopTrackingTouch(SeekBar seekBar) {
-		WifibotLab2Activity.SPEED = seekBar.getProgress();
+		speed = seekBar.getProgress();
 		TextView tvSpeed = (TextView) findViewById(R.id.tvSpeed);
 		tvSpeed.setText("Speed: " + seekBar.getProgress());
 	}
@@ -366,16 +361,53 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 			pgVoltage.setProgress((int)voltage_value);
 
 			ProgressBar pgFR = (ProgressBar) findViewById(R.id.pgFR);
-			pgFR.setProgress((int)ir_fr_rt);
+			pgFR.setProgress((int)irFr);
 
 			ProgressBar pgFL = (ProgressBar) findViewById(R.id.pgFL);
-			pgFL.setProgress((int)ir_fr_lf);
+			pgFL.setProgress((int)irFl);
 
 			ProgressBar pgBR = (ProgressBar) findViewById(R.id.pgBR);
-			pgBR.setProgress((int)ir_bk_rt);
+			pgBR.setProgress((int)irBr);
 
 			ProgressBar pgBL = (ProgressBar) findViewById(R.id.pgBL);
-			pgBL.setProgress((int)ir_bk_lf);
+			pgBL.setProgress((int)irBl);
+			
+			//IR label color
+			if(irFr > IR_LIMIT) {
+				((TextView) findViewById(R.id.tvFR)).setTextColor(Color.RED);
+			}
+			else {
+				((TextView) findViewById(R.id.tvFR)).setTextColor(Color.WHITE);
+			}
+			
+			if(irFl > IR_LIMIT) {
+				((TextView) findViewById(R.id.tvFL)).setTextColor(Color.RED);
+			}
+			else {
+				((TextView) findViewById(R.id.tvFL)).setTextColor(Color.WHITE);
+			}
+			
+			if(irBr > IR_LIMIT) {
+				((TextView) findViewById(R.id.tvBR)).setTextColor(Color.RED);
+			}
+			else {
+				((TextView) findViewById(R.id.tvBR)).setTextColor(Color.WHITE);
+			}
+			
+			if(irBl > IR_LIMIT) {
+				((TextView) findViewById(R.id.tvBL)).setTextColor(Color.RED);
+			}
+			else {
+				((TextView) findViewById(R.id.tvBL)).setTextColor(Color.WHITE);
+			}
+			
+			//voltage limit
+			if(voltage < VOLTAGE_LIMIT) {
+				((TextView) findViewById(R.id.tvVoltage)).setTextColor(Color.RED);
+			}
+			else {
+				((TextView) findViewById(R.id.tvVoltage)).setTextColor(Color.WHITE);
+			}
 		}
 	};
 
