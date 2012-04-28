@@ -135,7 +135,7 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 		CheckBox cbSecurity = (CheckBox) findViewById(R.id.cbSecurity);
 		cbSecurity.setOnCheckedChangeListener(this);
 
-/*		btnConnected.setChecked(false);
+		btnConnected.setChecked(false);
 		btnForward.setEnabled(false);
 		btnBackward.setEnabled(false);
 		btnLeft.setEnabled(false);
@@ -147,7 +147,7 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 		pgFL.setEnabled(false);
 		pgBR.setEnabled(false);
 		pgBL.setEnabled(false);
-		cbSecurity.setEnabled(false);*/
+		cbSecurity.setEnabled(false);
 	}
 
 
