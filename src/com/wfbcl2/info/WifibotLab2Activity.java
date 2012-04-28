@@ -135,7 +135,7 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 		CheckBox cbSecurity = (CheckBox) findViewById(R.id.cbSecurity);
 		cbSecurity.setOnCheckedChangeListener(this);
 
-		btnConnected.setChecked(false);
+/*		btnConnected.setChecked(false);
 		btnForward.setEnabled(false);
 		btnBackward.setEnabled(false);
 		btnLeft.setEnabled(false);
@@ -147,7 +147,7 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 		pgFL.setEnabled(false);
 		pgBR.setEnabled(false);
 		pgBL.setEnabled(false);
-		cbSecurity.setEnabled(false);
+		cbSecurity.setEnabled(false);*/
 	}
 
 
@@ -163,6 +163,9 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 			else if (action == MotionEvent.ACTION_UP){
 				wcs.nothing();
 			}
+			else if (action == MotionEvent.ACTION_CANCEL){
+				wcs.nothing();
+			}
 		}
 
 		if(elem.getId() == R.id.btnBackward) {
@@ -170,6 +173,9 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 				wcs.backward(speed);
 			}
 			else if (action == MotionEvent.ACTION_UP){
+				wcs.nothing();
+			}
+			else if (action == MotionEvent.ACTION_CANCEL){
 				wcs.nothing();
 			}
 		}
@@ -181,6 +187,9 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 			else if (action == MotionEvent.ACTION_UP){
 				wcs.nothing();
 			}
+			else if (action == MotionEvent.ACTION_CANCEL){
+				wcs.nothing();
+			}
 		}
 
 		if(elem.getId() == R.id.btnRight) {
@@ -190,6 +199,9 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 			else if (action == MotionEvent.ACTION_UP){
 				wcs.nothing();
 			}
+			else if (action == MotionEvent.ACTION_CANCEL){
+				wcs.nothing();
+			}
 		}
 
 		if(elem.getId() == R.id.btnRotate) {
@@ -197,6 +209,9 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 				wcs.rotate(speed, true);
 			}
 			else if (action == MotionEvent.ACTION_UP){
+				wcs.nothing();
+			}
+			else if (action == MotionEvent.ACTION_CANCEL){
 				wcs.nothing();
 			}
 		}
