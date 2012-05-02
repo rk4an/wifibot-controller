@@ -166,9 +166,11 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 			else if (action == MotionEvent.ACTION_CANCEL){
 				wcs.nothing();
 			}
+			else if (action == MotionEvent.ACTION_POINTER_UP){
+				wcs.nothing();
+			}
 		}
-
-		if(elem.getId() == R.id.btnBackward) {
+		else if(elem.getId() == R.id.btnBackward) {
 			if (action == MotionEvent.ACTION_DOWN){
 				wcs.backward(speed);
 			}
@@ -178,9 +180,11 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 			else if (action == MotionEvent.ACTION_CANCEL){
 				wcs.nothing();
 			}
+			else if (action == MotionEvent.ACTION_POINTER_UP){
+				wcs.nothing();
+			}
 		}
-
-		if(elem.getId() == R.id.btnLeft) {
+		else if(elem.getId() == R.id.btnLeft) {
 			if (action == MotionEvent.ACTION_DOWN){
 				wcs.direction(speed, true, true);
 			}
@@ -190,9 +194,11 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 			else if (action == MotionEvent.ACTION_CANCEL){
 				wcs.nothing();
 			}
+			else if (action == MotionEvent.ACTION_POINTER_UP){
+				wcs.nothing();
+			}
 		}
-
-		if(elem.getId() == R.id.btnRight) {
+		else if(elem.getId() == R.id.btnRight) {
 			if (action == MotionEvent.ACTION_DOWN){
 				wcs.direction(speed, false, true);
 			}
@@ -202,9 +208,11 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 			else if (action == MotionEvent.ACTION_CANCEL){
 				wcs.nothing();
 			}
+			else if (action == MotionEvent.ACTION_POINTER_UP){
+				wcs.nothing();
+			}
 		}
-
-		if(elem.getId() == R.id.btnRotate) {
+		else if(elem.getId() == R.id.btnRotate) {
 			if (action == MotionEvent.ACTION_DOWN){
 				wcs.rotate(speed, true);
 			}
@@ -212,6 +220,9 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 				wcs.nothing();
 			}
 			else if (action == MotionEvent.ACTION_CANCEL){
+				wcs.nothing();
+			}
+			else if (action == MotionEvent.ACTION_POINTER_UP){
 				wcs.nothing();
 			}
 		}
