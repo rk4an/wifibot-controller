@@ -79,8 +79,8 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 	public int irBr = 0;
 	public boolean onSecurity = false;
 
-	public int[] current_means = new int[10];
-	public int current_index = 0;
+	//public int[] current_means = new int[10];
+	//public int current_index = 0;
 	
 	Handler handler = new Handler();
 
@@ -387,7 +387,7 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 			float voltage_value = (float) (WifibotLab2Activity.this.voltage/10.0);
 			tvVoltage.setText("Voltage: " + voltage_value);
 			
-			//((TextView) findViewById(R.id.tvCurrent)).setText(WifibotLab2Activity.this.current*100 + "mA");
+			((TextView) findViewById(R.id.tvCurrent)).setText(WifibotLab2Activity.this.current*100 + "mA");
 
 			ProgressBar pgVoltage = (ProgressBar) findViewById(R.id.pgVoltage);
 			pgVoltage.setProgress((int)voltage_value);
@@ -433,7 +433,7 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 				((TextView) findViewById(R.id.tvBL)).setTextColor(Color.WHITE);
 			}
 			
-			current_means[current_index] = WifibotLab2Activity.this.current*100;
+			/*current_means[current_index] = WifibotLab2Activity.this.current*100;
 			current_index++;
 			if(current_index == 10)
 				current_index = 0;
@@ -446,7 +446,7 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 			}
 			means = total/10;
 			((TextView) findViewById(R.id.tvCurrent)).setText(means+"mAh");
-			
+			*/
 			
 			//voltage limit
 			if(voltage < VOLTAGE_LIMIT) {
