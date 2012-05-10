@@ -19,9 +19,12 @@
 
 package com.wfbcl2.info;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -35,6 +38,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -58,17 +62,20 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 	private WifibotCmdSender wcs = null;
 	private static String IP = "192.168.1.106";
 	private static int PORT = 15020;
+	private static int RFID_PORT = 9999;
 	private static int REFRESH_TIME = 100;
-	
+
 	private static int VOLTAGE_MAX = 18;
 	private static int VOLTAGE_LIMIT = 11;
-	
+
 	private static int SPEED_MAX = 360;
 	private static int SPEED_DEFAULT = 200;
-	
+
+	private static int BATTERY_FULL = 17;
+
 	private static int IR_MAX = 255;
 	public static int IR_LIMIT = 60;
-	
+
 	private Timer timer = null;
 	public int voltage = 0;
 	public int current = 0;
@@ -77,12 +84,18 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 	public int irFr = 0;
 	public int irBl = 0;
 	public int irBr = 0;
+	public int batteryState = 0;
 	public boolean onSecurity = false;
 
 	//public int[] current_means = new int[10];
 	//public int current_index = 0;
-	
+
 	Handler handler = new Handler();
+
+
+	public Socket socket = null;
+	public BufferedReader r;
+	public Thread thrd;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -126,7 +139,7 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 
 		ProgressBar pgFR = (ProgressBar) findViewById(R.id.pgFR);
 		pgFR.setMax(IR_MAX);
-		
+
 		ProgressBar pgFL = (ProgressBar) findViewById(R.id.pgFL);
 		pgFL.setMax(IR_MAX);
 
@@ -151,6 +164,38 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 		pgBR.setEnabled(false);
 		pgBL.setEnabled(false);
 		cbSecurity.setEnabled(false);
+
+		//connect to RFID
+		socket = new Socket();
+		try {
+			socket.connect(new InetSocketAddress(IP, RFID_PORT), 1000);
+			r = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		thrd = new Thread(new Runnable() {
+			public void run() {
+				while (!Thread.interrupted()) {
+					try {
+						final String data = r.readLine();
+						if (data != null)
+							Log.d("DATA",data);
+
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								((TextView) findViewById(R.id.tvRfid)).setText("RFID: " + data);
+							}
+						});
+
+					} catch (IOException e) { }
+				}
+			}
+		});
+
+		thrd.start();
+
 	}
 
 
@@ -386,7 +431,7 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 			TextView tvVoltage = (TextView) findViewById(R.id.tvVoltage);
 			float voltage_value = (float) (WifibotLab2Activity.this.voltage/10.0);
 			tvVoltage.setText("Voltage: " + voltage_value);
-			
+
 			((TextView) findViewById(R.id.tvCurrent)).setText(WifibotLab2Activity.this.current*100 + "mA");
 
 			ProgressBar pgVoltage = (ProgressBar) findViewById(R.id.pgVoltage);
@@ -403,7 +448,7 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 
 			ProgressBar pgBL = (ProgressBar) findViewById(R.id.pgBL);
 			pgBL.setProgress((int)irBl);
-			
+
 			//IR label color
 			if(irFr > IR_LIMIT) {
 				((TextView) findViewById(R.id.tvFR)).setTextColor(Color.RED);
@@ -411,33 +456,33 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 			else {
 				((TextView) findViewById(R.id.tvFR)).setTextColor(Color.WHITE);
 			}
-			
+
 			if(irFl > IR_LIMIT) {
 				((TextView) findViewById(R.id.tvFL)).setTextColor(Color.RED);
 			}
 			else {
 				((TextView) findViewById(R.id.tvFL)).setTextColor(Color.WHITE);
 			}
-			
+
 			if(irBr > IR_LIMIT) {
 				((TextView) findViewById(R.id.tvBR)).setTextColor(Color.RED);
 			}
 			else {
 				((TextView) findViewById(R.id.tvBR)).setTextColor(Color.WHITE);
 			}
-			
+
 			if(irBl > IR_LIMIT) {
 				((TextView) findViewById(R.id.tvBL)).setTextColor(Color.RED);
 			}
 			else {
 				((TextView) findViewById(R.id.tvBL)).setTextColor(Color.WHITE);
 			}
-			
+
 			/*current_means[current_index] = WifibotLab2Activity.this.current*100;
 			current_index++;
 			if(current_index == 10)
 				current_index = 0;
-			
+
 			int total = 0;
 			int means = 0;
 			for(int i=0;i<10;i++)
@@ -446,14 +491,19 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 			}
 			means = total/10;
 			((TextView) findViewById(R.id.tvCurrent)).setText(means+"mAh");
-			*/
-			
+			 */
+
 			//voltage limit
 			if(voltage < VOLTAGE_LIMIT) {
 				((TextView) findViewById(R.id.tvVoltage)).setTextColor(Color.RED);
 			}
 			else {
 				((TextView) findViewById(R.id.tvVoltage)).setTextColor(Color.WHITE);
+			}
+
+			//display battery full
+			if(batteryState == BATTERY_FULL) {
+				((TextView) findViewById(R.id.tvVoltage)).setText("BATTERY FULL");
 			}
 		}
 	};

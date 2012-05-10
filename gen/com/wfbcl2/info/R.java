@@ -23,8 +23,8 @@ public final class R {
         public static final int btnRight=0x7f070006;
         public static final int btnRotate=0x7f070005;
         public static final int cbSecurity=0x7f070014;
-        public static final int iAbout=0x7f070017;
-        public static final int iSettings=0x7f070016;
+        public static final int iAbout=0x7f070018;
+        public static final int iSettings=0x7f070017;
         public static final int llMain=0x7f070000;
         public static final int pgBL=0x7f070010;
         public static final int pgBR=0x7f070011;
@@ -37,6 +37,7 @@ public final class R {
         public static final int tvCurrent=0x7f070015;
         public static final int tvFL=0x7f07000e;
         public static final int tvFR=0x7f07000f;
+        public static final int tvRfid=0x7f070016;
         public static final int tvSpeed=0x7f070009;
         public static final int tvState=0x7f070001;
         public static final int tvVoltage=0x7f07000b;
@@ -52,6 +53,7 @@ public final class R {
         public static final int sAbout=0x7f050008;
         public static final int sBackward=0x7f050002;
         public static final int sCurrent=0x7f05000f;
+        public static final int sEmpty=0x7f050010;
         public static final int sForward=0x7f050001;
         public static final int sIP=0x7f050006;
         public static final int sLeft=0x7f050003;

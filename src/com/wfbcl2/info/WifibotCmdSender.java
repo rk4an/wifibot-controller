@@ -98,6 +98,7 @@ public class WifibotCmdSender extends TimerTask {
 			for(int i=0;i<RESPONSE_LENGTH;i++) {
 				read_cmd += String.format("%x", rdata[i]) + " ";
 			}
+			
 			//Log.d("READ",read_cmd);
 			
 			context.voltage = (short)(rdata[2] & 0xff);
@@ -106,6 +107,7 @@ public class WifibotCmdSender extends TimerTask {
 			context.irBr = (short)(rdata[4] & 0xff);
 			context.irBl = (short)(rdata[12] & 0xff);
 			context.current = (short)(rdata[17] & 0xff);
+			context.batteryState = (short)(rdata[18] & 0xff);
 			context.handler.post(context.updateUI);
 			
 
