@@ -87,6 +87,8 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 	public int batteryState = 0;
 	public boolean onSecurity = false;
 
+	public boolean rfidConnected = false;
+
 	//public int[] current_means = new int[10];
 	//public int current_index = 0;
 
@@ -95,7 +97,7 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 
 	public Socket socket = null;
 	public BufferedReader r;
-	public Thread thrd;
+	public Thread thrd;	
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -170,6 +172,7 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 		try {
 			socket.connect(new InetSocketAddress(IP, RFID_PORT), 1000);
 			r = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			rfidConnected = true;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -178,18 +181,24 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 			public void run() {
 				while (!Thread.interrupted()) {
 					try {
-						final String data = r.readLine();
-						if (data != null)
-							Log.d("DATA",data);
+						if(rfidConnected) {	
+							final String data = r.readLine();
+							if (data != null)
+								Log.d("DATA",data);
 
-						runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								((TextView) findViewById(R.id.tvRfid)).setText("RFID: " + data);
-							}
-						});
+							runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									if(data.split(";")[0].equals("R"))
+										((TextView) findViewById(R.id.tvRfid)).setText("RFID: " + data.split(";")[1]);
+									else
+										((TextView) findViewById(R.id.tvRfid)).setText("");
+								}
+							});
+						}
+					} catch (IOException e) {
 
-					} catch (IOException e) { }
+					}
 				}
 			}
 		});
@@ -400,8 +409,11 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 	@Override
 	protected void onStop() {
 		super.onStop();
+		
 		if(timer != null)
 			timer.cancel();
+		
+		thrd.stop();
 	}
 
 
