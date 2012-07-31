@@ -34,6 +34,7 @@ import android.content.pm.PackageInfo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -87,6 +88,11 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		//TODO: fix this!
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+		StrictMode.setThreadPolicy(policy);
+		
 		setContentView(R.layout.main);
 
 		Button btnForward = (Button) findViewById(R.id.btnForward);
