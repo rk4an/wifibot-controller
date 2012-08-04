@@ -24,6 +24,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.TimerTask;
 
+import android.util.Log;
+
 
 public class WifibotCmdSender extends TimerTask {
 
@@ -67,14 +69,16 @@ public class WifibotCmdSender extends TimerTask {
 			//check security
 			if(context.onSecurity) {
 				//block forward
-				if(dataArray[6] == 0x5b && (rdata[11] > WifibotLab2Activity.IR_LIMIT || rdata[3] > WifibotLab2Activity.IR_LIMIT)){
+				if( (((int) dataArray[6] & 0x50) == 0x50) && 
+						(rdata[11] > WifibotLab2Activity.IR_LIMIT || rdata[3] > WifibotLab2Activity.IR_LIMIT)){
 					dataArray[2] = 0;
 					dataArray[3] = 0;
 					dataArray[4] = 0;
 					dataArray[5] = 0;
 				}
 				
-				if(dataArray[6] == 0x0b && (rdata[12] > WifibotLab2Activity.IR_LIMIT || rdata[4] > WifibotLab2Activity.IR_LIMIT)){
+				if( (((int) dataArray[6] & 0x50) == 0x00) && 
+						(rdata[12] > WifibotLab2Activity.IR_LIMIT || rdata[4] > WifibotLab2Activity.IR_LIMIT)){
 					dataArray[2] = 0;
 					dataArray[3] = 0;
 					dataArray[4] = 0;
@@ -89,7 +93,7 @@ public class WifibotCmdSender extends TimerTask {
 			for(int i=0;i<9;i++) {
 				write_cmd += String.format("%x", data[i]) + " ";
 			}
-			//Log.d("WRITE",write_cmd);
+			Log.d("WRITE",write_cmd);
 			
 			//read response
 			dis.readFully(rdata);
@@ -98,7 +102,7 @@ public class WifibotCmdSender extends TimerTask {
 			for(int i=0;i<RESPONSE_LENGTH;i++) {
 				read_cmd += String.format("%x", rdata[i]) + " ";
 			}
-			//Log.d("READ",read_cmd);
+			Log.d("READ",read_cmd);
 			
 			context.voltage = (short)(rdata[2] & 0xff);
 			context.irFr = (short)(rdata[11] & 0xff);
@@ -106,6 +110,7 @@ public class WifibotCmdSender extends TimerTask {
 			context.irBr = (short)(rdata[4] & 0xff);
 			context.irBl = (short)(rdata[12] & 0xff);
 			context.current = (short)(rdata[17] & 0xff);
+			context.batteryState = (short)(rdata[18] & 0xff);
 			context.handler.post(context.updateUI);
 			
 
@@ -127,7 +132,15 @@ public class WifibotCmdSender extends TimerTask {
 		dataArray[3] = (byte) (speed>>8);
 		dataArray[4] = (byte) speed;	//right speed
 		dataArray[5] = (byte) (speed>>8);
-		dataArray[6] = (byte) 0x0b;		//backward
+		dataArray[6] = (byte) 0x03;		//backward
+		
+		if(context.onMotorControl) {
+			dataArray[6] = (byte) ((int)dataArray[6] | 0xa0);
+		}
+		
+		if(WifibotLab2Activity.MOTOR_CONTROL_PID_10) {
+			dataArray[6] = (byte) ((int)dataArray[6] | 0x08);
+		}
 
 		CRC16 crc = new CRC16();
 		for (int i=1; i<7; i++) {
@@ -153,8 +166,16 @@ public class WifibotCmdSender extends TimerTask {
 		dataArray[3] = (byte) (speed>>8);
 		dataArray[4] = (byte) speed;
 		dataArray[5] = (byte) (speed>>8);
-		dataArray[6] = (byte) 0x5b;	
+		dataArray[6] = (byte) 0x53;
 
+		if(context.onMotorControl) {
+			dataArray[6] = (byte) ((int)dataArray[6] | 0xa0);
+		}
+
+		if(WifibotLab2Activity.MOTOR_CONTROL_PID_10) {
+			dataArray[6] = (byte) ((int)dataArray[6] | 0x08);
+		}
+		
 		CRC16 crc = new CRC16();
 		for (int i=1; i<7; i++) {
 			crc.update(dataArray[i]);
@@ -174,7 +195,7 @@ public class WifibotCmdSender extends TimerTask {
 		dataArray[3] = (byte) 0x00;
 		dataArray[4] = (byte) 0x00;
 		dataArray[5] = (byte) 0x00;
-		dataArray[6] = (byte) 0x5b;
+		dataArray[6] = (byte) 0x53;
 
 		CRC16 crc = new CRC16();
 		for (int i=1; i<7; i++) {
@@ -198,11 +219,21 @@ public class WifibotCmdSender extends TimerTask {
 		dataArray[3] = (byte) (speed>>8);
 		dataArray[4] = (byte) speed;
 		dataArray[5] = (byte) (speed>>8);
-		if(clock)
-			dataArray[6] = (byte) 0x4b;
-		else
-			dataArray[6] = (byte) 0x1b;
+		if(clock) {
+			dataArray[6] = (byte) 0x43;
+		}
+		else {
+			dataArray[6] = (byte) 0x13;
+		}
 
+		if(context.onMotorControl) {
+			dataArray[6] = (byte) ((int)dataArray[6] | 0xa0);
+		}
+		
+		if(WifibotLab2Activity.MOTOR_CONTROL_PID_10) {
+			dataArray[6] = (byte) ((int)dataArray[6] | 0x08);
+		}
+		
 		CRC16 crc = new CRC16();
 		for (int i=1; i<7; i++) {
 			crc.update(dataArray[i]);
@@ -229,10 +260,12 @@ public class WifibotCmdSender extends TimerTask {
 
 			dataArray[4] = (byte) 0x00;
 			dataArray[5] = (byte) 0x00;
-			if(forward)
-				dataArray[6] = (byte) 0x4b;
-			else
-				dataArray[6] = (byte) 0x0b;
+			if(forward) {
+				dataArray[6] = (byte) 0x43;
+			}
+			else {
+				dataArray[6] = (byte) 0x03;
+			}
 		}
 		else
 		{
@@ -241,13 +274,22 @@ public class WifibotCmdSender extends TimerTask {
 
 			dataArray[4] = (byte) speed;
 			dataArray[5] = (byte) (speed>>8);
-			if(forward)
-				dataArray[6] = (byte) 0x1b;
-			else
-				dataArray[6] = (byte) 0x0b;
+			if(forward) {
+				dataArray[6] = (byte) 0x13;
+			}
+			else {
+				dataArray[6] = (byte) 0x03;
+			}
 		}
 
+		if(context.onMotorControl) {
+			dataArray[6] = (byte) ((int)dataArray[6] | 0xa0);
+		}
 
+		if(WifibotLab2Activity.MOTOR_CONTROL_PID_10) {
+			dataArray[6] = (byte) ((int)dataArray[6] | 0x08);
+		}
+		
 		CRC16 crc = new CRC16();
 		for (int i=1; i<7; i++) {
 			crc.update(dataArray[i]);

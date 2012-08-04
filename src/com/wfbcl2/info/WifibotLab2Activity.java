@@ -60,16 +60,20 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 	private static String IP = "192.168.1.106";
 	private static int PORT = 15020;
 	private static int REFRESH_TIME = 100;
-	
+
 	private static int VOLTAGE_MAX = 18;
 	private static int VOLTAGE_LIMIT = 11;
-	
+
 	private static int SPEED_MAX = 360;
 	private static int SPEED_DEFAULT = 200;
+
+	public static boolean MOTOR_CONTROL_PID_10 = false;
 	
+	private static int BATTERY_FULL = 17;
+
 	private static int IR_MAX = 255;
 	public static int IR_LIMIT = 60;
-	
+
 	private Timer timer = null;
 	public int voltage = 0;
 	public int current = 0;
@@ -78,21 +82,23 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 	public int irFr = 0;
 	public int irBl = 0;
 	public int irBr = 0;
+	public int batteryState = 0;
 	public boolean onSecurity = false;
+	public boolean onMotorControl = false;
 
 	//public int[] current_means = new int[10];
 	//public int current_index = 0;
-	
+
 	Handler handler = new Handler();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		//TODO: fix this!
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 		StrictMode.setThreadPolicy(policy);
-		
+
 		setContentView(R.layout.main);
 
 		Button btnForward = (Button) findViewById(R.id.btnForward);
@@ -132,7 +138,7 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 
 		ProgressBar pgFR = (ProgressBar) findViewById(R.id.pgFR);
 		pgFR.setMax(IR_MAX);
-		
+
 		ProgressBar pgFL = (ProgressBar) findViewById(R.id.pgFL);
 		pgFL.setMax(IR_MAX);
 
@@ -144,6 +150,9 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 		CheckBox cbSecurity = (CheckBox) findViewById(R.id.cbSecurity);
 		cbSecurity.setOnCheckedChangeListener(this);
 
+		CheckBox cbMotor = (CheckBox) findViewById(R.id.cbMotor);
+		cbMotor.setOnCheckedChangeListener(this);
+		
 		btnConnected.setChecked(false);
 		btnForward.setEnabled(false);
 		btnBackward.setEnabled(false);
@@ -157,6 +166,7 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 		pgBR.setEnabled(false);
 		pgBL.setEnabled(false);
 		cbSecurity.setEnabled(false);
+		cbMotor.setEnabled(false);
 	}
 
 
@@ -257,6 +267,7 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 		ProgressBar pgBR = (ProgressBar) findViewById(R.id.pgBR);
 		ProgressBar pgBL = (ProgressBar) findViewById(R.id.pgBL);
 		CheckBox cbSecurity = (CheckBox) findViewById(R.id.cbSecurity);
+		CheckBox cbMotor = (CheckBox) findViewById(R.id.cbMotor);
 
 		if(v.getId() == R.id.btnConnected){
 
@@ -292,6 +303,7 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 					pgBR.setEnabled(true);
 					pgBL.setEnabled(true);
 					cbSecurity.setEnabled(true);
+					cbMotor.setEnabled(true);
 
 					tvState.setText("State: Connected");
 
@@ -320,6 +332,7 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 				pgBL.setEnabled(false);
 				pgBL.setProgress(0);
 				cbSecurity.setEnabled(false);
+				cbMotor.setEnabled(false);
 				tvVoltage.setText("Voltage: 0");
 				if(timer != null)
 					timer.cancel();
@@ -392,7 +405,7 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 			TextView tvVoltage = (TextView) findViewById(R.id.tvVoltage);
 			float voltage_value = (float) (WifibotLab2Activity.this.voltage/10.0);
 			tvVoltage.setText("Voltage: " + voltage_value);
-			
+
 			((TextView) findViewById(R.id.tvCurrent)).setText(WifibotLab2Activity.this.current*100 + "mA");
 
 			ProgressBar pgVoltage = (ProgressBar) findViewById(R.id.pgVoltage);
@@ -409,7 +422,7 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 
 			ProgressBar pgBL = (ProgressBar) findViewById(R.id.pgBL);
 			pgBL.setProgress((int)irBl);
-			
+
 			//IR label color
 			if(irFr > IR_LIMIT) {
 				((TextView) findViewById(R.id.tvFR)).setTextColor(Color.RED);
@@ -417,33 +430,33 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 			else {
 				((TextView) findViewById(R.id.tvFR)).setTextColor(Color.WHITE);
 			}
-			
+
 			if(irFl > IR_LIMIT) {
 				((TextView) findViewById(R.id.tvFL)).setTextColor(Color.RED);
 			}
 			else {
 				((TextView) findViewById(R.id.tvFL)).setTextColor(Color.WHITE);
 			}
-			
+
 			if(irBr > IR_LIMIT) {
 				((TextView) findViewById(R.id.tvBR)).setTextColor(Color.RED);
 			}
 			else {
 				((TextView) findViewById(R.id.tvBR)).setTextColor(Color.WHITE);
 			}
-			
+
 			if(irBl > IR_LIMIT) {
 				((TextView) findViewById(R.id.tvBL)).setTextColor(Color.RED);
 			}
 			else {
 				((TextView) findViewById(R.id.tvBL)).setTextColor(Color.WHITE);
 			}
-			
+
 			/*current_means[current_index] = WifibotLab2Activity.this.current*100;
 			current_index++;
 			if(current_index == 10)
 				current_index = 0;
-			
+
 			int total = 0;
 			int means = 0;
 			for(int i=0;i<10;i++)
@@ -452,8 +465,8 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 			}
 			means = total/10;
 			((TextView) findViewById(R.id.tvCurrent)).setText(means+"mAh");
-			*/
-			
+			 */
+
 			//voltage limit
 			if(voltage < VOLTAGE_LIMIT) {
 				((TextView) findViewById(R.id.tvVoltage)).setTextColor(Color.RED);
@@ -461,6 +474,12 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 			else {
 				((TextView) findViewById(R.id.tvVoltage)).setTextColor(Color.WHITE);
 			}
+
+			//display battery full
+			if(batteryState == BATTERY_FULL) {
+				((TextView) findViewById(R.id.tvVoltage)).setText("BATTERY FULL");
+			}
+
 		}
 	};
 
@@ -469,6 +488,9 @@ public class WifibotLab2Activity extends Activity implements OnClickListener, On
 
 		if(cb.getId() == R.id.cbSecurity) {
 			this.onSecurity = state;
+		}
+		else if(cb.getId() == R.id.cbMotor) {
+			this.onMotorControl = state;
 		}
 	}
 
