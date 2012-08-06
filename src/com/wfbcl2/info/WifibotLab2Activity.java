@@ -54,7 +54,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-public class WifibotLab2Activity extends Activity implements OnClickListener, OnTouchListener, OnSeekBarChangeListener, OnCheckedChangeListener {
+public class WifibotLab2Activity 
+extends Activity 
+implements OnClickListener, OnTouchListener, OnSeekBarChangeListener, OnCheckedChangeListener {
 
 	private WifibotCmdSender wcs = null;
 	private static String IP = "192.168.1.106";
