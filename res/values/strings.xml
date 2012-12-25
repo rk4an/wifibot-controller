@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Wifibot Lab2 Controller</string>
+    <string name="app_name">Wifibot Controller</string>
     <string name="sForward">Forward</string>
     <string name="sBackward">Backward</string>
     <string name="sLeft">Left</string>
