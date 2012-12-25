@@ -1,7 +1,7 @@
-WifibotLab2-Controller
+Wifibot-Controller
 =========================
 
-**WifibotLab2 Controller is an Android remote control**
+**Wifibot Controller is an Android remote control**
 
 Features:
 
